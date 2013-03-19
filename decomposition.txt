@@ -1,0 +1,38 @@
+Chess classes:
+  Chess
+  Board
+  Player
+  Piece
+    King
+    Queen
+    Rook
+    Bishop
+    Knight
+    Pawn
+
+
+Monopoly classes:
+  Monopoly
+  Board
+  Player
+  Die
+  Card
+    Community Chest
+    Chance
+  Property
+
+
+Forum classes:
+  Forum
+  Post
+  User
+    Admin
+    Moderator
+  Avatar
+  Attachment
+
+
+Twitter classes:
+  Twitter
+  Tweet
+  User
