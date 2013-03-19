@@ -45,9 +45,14 @@ class Board
   end
 
   def show_board
-    @rows.each do |row|
+
+    @rows.each_with_index do |row, index|
+      print "#{@rows.length - index} "
       puts row.map { |x| x.respond_to?(:image) ? x.image : EMPTY_SQUARE }.join(' ')
     end
+
+    print "  "
+    8.times { |ordinal| print (ordinal+65).chr + " "}
 
     nil
   end
