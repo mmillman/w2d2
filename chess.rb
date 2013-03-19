@@ -64,6 +64,12 @@ class Board
     @rows[from_y][from_x] = nil
   end
 
+  def to_xy(chess_notation)
+    x = chess_notation[0].upcase.ord - 65
+    y = 8 - chess_notation[1].to_i
+    [x, y]
+  end
+
 end
 
 
