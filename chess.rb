@@ -98,7 +98,7 @@ class King < Piece
   end
 
   def image
-    'K'
+    @color == :w ? "\u2654" : "\u265A"
   end
 end
 
@@ -108,7 +108,7 @@ class Queen < Piece
   RANGE = 8
 
   def image
-    'Q'
+    @color == :w ? "\u2655" : "\u265B"
   end
 end
 
@@ -118,7 +118,7 @@ class Rook < Piece
   RANGE = 8
 
   def image
-    'R'
+    @color == :w ? "\u2656" : "\u265C"
   end
 end
 
@@ -128,7 +128,7 @@ class Bishop < Piece
   RANGE = 8
 
   def image
-    'B'
+    @color == :w ? "\u2657" : "\u265D"
   end
 end
 
@@ -138,7 +138,7 @@ class Knight < Piece
               [2, 1], [-2, 1], [2, -1], [-2, -1]]
 
   def image
-    'N'
+    @color == :w ? "\u2658" : "\u265E"
   end
 end
 
@@ -152,7 +152,7 @@ class Pawn < Piece
   end
 
   def image
-    'P'
+    @color == :w ? "\u2659" : "\u265F"
   end
 
   def move
