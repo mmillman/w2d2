@@ -16,7 +16,7 @@ class Board
   end
 
   def construct_board
-    @rows = Array.new(8, Array.new(8, []))
+    @rows = Array.new(8) { Array.new(8) }
   end
 
   def set_up_pieces
@@ -45,16 +45,23 @@ class Board
   end
 
   def show_board
-
     @rows.each_with_index do |row, index|
       print "#{@rows.length - index} "
       puts row.map { |x| x.respond_to?(:image) ? x.image : EMPTY_SQUARE }.join(' ')
     end
 
     print "  "
-    8.times { |ordinal| print (ordinal+65).chr + " "}
+    puts ('A'..'H').to_a.join(' ')
 
     nil
+  end
+
+  def move_piece(from_coord, to_coord)
+    from_y, from_x = from_coord[0], from_coord[1]
+    to_y, to_x = to_coord[0], to_coord[1]
+
+    @rows[to_y][to_x] = @rows[from_y][from_x]
+    @rows[from_y][from_x] = nil
   end
 
 end
