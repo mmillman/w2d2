@@ -1,6 +1,9 @@
 # coding: utf-8
 # p "®"
 
+class InvalidMoveError < RuntimeError
+end
+
 class Chess
 
 end
@@ -56,6 +59,24 @@ class Board
     nil
   end
 
+  def valid_move?
+
+  end
+
+  # clean this up
+  def make_move(from_chess_coord, to_chess_coord)
+    from_xy_coord = xy_notation(from_chess_coord)
+    to_xy_coord = xy_notation(to_chess_board)
+    if valid_move?(from_xy_coord, to_xy_coord)
+      move_piece(from_xy_coord, to_xy_coord)
+    else
+      raise InvalidMoveError
+    end
+  end
+
+  private :move_piece
+
+  # clean this up
   def move_piece(from_coord, to_coord)
     from_y, from_x = from_coord[0], from_coord[1]
     to_y, to_x = to_coord[0], to_coord[1]
@@ -64,7 +85,7 @@ class Board
     @rows[from_y][from_x] = nil
   end
 
-  def to_xy(chess_notation)
+  def xy_notation(chess_notation)
     x = chess_notation[0].upcase.ord - 65
     y = 8 - chess_notation[1].to_i
     [x, y]
