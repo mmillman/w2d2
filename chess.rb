@@ -1,6 +1,14 @@
 # coding: utf-8
 # p "®"
 
+=begin
+Overall the code is very well organized. Most of your methods are clear and 
+I think it will be easy to breack apart some of the longer ones. I especially
+like how you orginized the different pieces with MOVE_DIRECTIONS
+=end
+
+
+# REV: Good idea to make a custom error class
 class InvalidMoveError < RuntimeError
 end
 
@@ -13,7 +21,7 @@ class Board
 
   EMPTY_SQUARE = "-"
 
-  def initialize
+  def initialize # REV: I like the short initialize
     construct_board
     set_up_pieces
   end
@@ -22,7 +30,7 @@ class Board
     @rows = Array.new(8) { Array.new(8) }
   end
 
-  def set_up_pieces
+  def set_up_pieces # REV: the orginization here is great
     @rows[0] = [
                  Rook.new(:b),
                  Knight.new(:b),
@@ -96,7 +104,7 @@ class Board
     end
 =end
 
-  def invalid_collision?(move, destination, piece)
+  def invalid_collision?(move, destination, piece) # REV: This is a hard to follow
     other_piece = @rows[move[1]][move[0]]
     case
     when move != destination && !other_piece.nil? then true
@@ -137,17 +145,17 @@ class Board
 
 
   # clean this up
-  def move_piece(from_coord, to_coord)
+  def move_piece(from_coord, to_coord)  
     from_y, from_x = from_coord[0], from_coord[1]
     to_y, to_x = to_coord[0], to_coord[1]
 
-    @rows[to_y][to_x] = @rows[from_y][from_x]
-    @rows[from_y][from_x] = nil
+    @rows[to_y][to_x] = @rows[from_y][from_x]  # REV: Maybe you need a new location setting method that takes an array? 
+    @rows[from_y][from_x] = nil  
   end
 
   private :move_piece
 
-  def xy_notation(chess_notation)
+  def xy_notation(chess_notation) # REV: this is cool! 
     x = chess_notation[0].upcase.ord - 65
     y = 8 - chess_notation[1].to_i
     [x, y]
@@ -189,6 +197,8 @@ class Piece
   end
 
 end
+
+# REV: I like the way you concat the arrays for MOVE_DIRECTIONS, very clear
 
 
 class King < Piece
