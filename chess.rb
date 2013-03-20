@@ -23,6 +23,8 @@ class Board
   end
 
   def set_up_pieces
+    #REV could definitely have saved code between @rows[0]
+    # and @rows[7], but I get that this wasn't high priority
     @rows[0] = [
                  Rook.new(:b),
                  Knight.new(:b),
@@ -95,7 +97,7 @@ class Board
       end
     end
 =end
-
+  #REV good job writing this method - it's really easy to understand
   def invalid_collision?(move, destination, piece)
     other_piece = @rows[move[1]][move[0]]
     case
@@ -243,7 +245,8 @@ class Knight < Piece
   end
 end
 
-
+# REV are you handling different move sets when the pawn moves to take
+# piece?
 class Pawn < Piece
   MOVE_DIRECTIONS = @color == :w ? UP_DIAGONALS | UP : DOWN_DIAGONALS | DOWN
 
