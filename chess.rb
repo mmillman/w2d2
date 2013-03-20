@@ -59,14 +59,75 @@ class Board
     nil
   end
 
-  def valid_move?
+  # TODO: change all xy stuff to row/col
 
+  def valid_move?(from_coord, to_coord)
+    from_y, from_x = from_coord[0], from_coord[1]
+    to_y, to_x = to_coord[0], to_coord[1]
+    piece = @rows[from_y][from_x]
+    piece.class::MOVE_DIRECTIONS.any? do |direction|
+      can_reach?(from_coord, to_coord, direction, piece)
+    end
   end
 
-  # clean this up
+  def can_reach?(from_coord, to_coord, direction, piece)
+    moves_left = piece.class::RANGE
+    move_trail = [from_coord]
+    collided_with_piece = false
+    next_move = move_once(move_trail[-1], direction)
+
+    # TODO: simplify this
+    until moves_left == 0 ||
+          invalid_collision?(next_move, to_coord, piece) ||
+          !on_board?(next_move)
+      move_trail << next_move
+      moves_left -= 1
+      next_move = move_once(next_move, direction)
+    end
+
+    move_trail
+  end
+=begin
+    off_board = false
+    until current_coord.off_board? || collision || reach_destion
+      move_once(current_coord, direction)
+      if collided, collision = true
+      end
+    end
+=end
+
+  def invalid_collision?(move, destination, piece)
+    other_piece = @rows[move[1]][move[0]]
+    case
+    when move != destination && !other_piece.nil? then true
+    when move == destination
+      if other_piece.nil?
+        false
+      elsif other_piece.color != piece.color
+        false
+      else
+        true
+      end
+    else
+      false
+    end
+  end
+
+  def move_once(coord, direction)
+    coord.zip(direction).map { |pair| pair.reduce(0, :+) }
+  end
+
+  def on_board?(coord)
+    coord.all? { |x| x.between?(0, 7) }
+  end
+
+
+  # TODO: clean this up
   def make_move(from_chess_coord, to_chess_coord)
     from_xy_coord = xy_notation(from_chess_coord)
-    to_xy_coord = xy_notation(to_chess_board)
+    to_xy_coord = xy_notation(to_chess_coord)
+    puts @rows[from_xy_coord[1]][from_xy_coord[0]]
+    puts @rows[to_xy_coord[1]][to_xy_coord[0]]
     if valid_move?(from_xy_coord, to_xy_coord)
       move_piece(from_xy_coord, to_xy_coord)
     else
@@ -74,7 +135,6 @@ class Board
     end
   end
 
-  private :move_piece
 
   # clean this up
   def move_piece(from_coord, to_coord)
@@ -84,6 +144,8 @@ class Board
     @rows[to_y][to_x] = @rows[from_y][from_x]
     @rows[from_y][from_x] = nil
   end
+
+  private :move_piece
 
   def xy_notation(chess_notation)
     x = chess_notation[0].upcase.ord - 65
