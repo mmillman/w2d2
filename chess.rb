@@ -78,18 +78,35 @@ class Board
 
   def valid_move?(from_coord, to_coord)
     piece = self[from_coord]
+    return false unless piece
+
+    if piece.is_a? Pawn
+      destination_attackable = piece.attack_directions.any? do |direction|
+        attack_coord = move_once(from_coord, direction)
+
+        valid_pawn_attack?(from_coord, attack_coord) && attack_coord == to_coord
+      end
+
+      return true if destination_attackable
+    end
 
     piece.move_directions.any? do |direction|
-
       can_reach?(from_coord, to_coord, direction, piece)
     end
   end
 
+  def valid_pawn_attack?(from_coord, attack_coord)
+    attacking_pawn = self[from_coord]
+    victim = self[attack_coord]
+    victim ? victim.color != attacking_pawn.color : false
+  end
+
   def can_reach?(from_coord, to_coord, direction, piece)
     moves_left = piece.range
+
     puts moves_left
+
     move_trail = [from_coord]
-    collided_with_piece = false
     next_move = move_once(move_trail[-1], direction)
 
     # TODO: simplify this
@@ -106,41 +123,17 @@ class Board
 
     false
   end
-=begin
-    while true
 
-      case
-      when moves_left == 0 then return false
-      when off_board?(next_move) then return false
-      when invalid_collision?(next_move, to_coord, piece) then return false
-      when next_move == to_coord then return true
-      else
-        move_trail << next_move
-        moves_left -= 1
-        next_move = move_once(next_move, direction)
-      end
-    end
-  end
-=end
-
-=begin
-    off_board = false
-    until current_coord.off_board? || collision || reach_destion
-      move_once(current_coord, direction)
-      if collided, collision = true
-      end
-    end
-=end
-
-  def invalid_collision?(move, destination, piece)
-    other_piece = self[move]
+  def invalid_collision?(possible_next_move, destination, piece)
+    other_piece = self[possible_next_move]
     case
-    when move != destination && other_piece then true
-    when move == destination
+    when possible_next_move != destination && other_piece then true
+    when possible_next_move == destination
       if other_piece.nil?
         false
-      elsif other_piece.color != piece.color
-        false
+      elsif other_piece.color != piece.color #&& piece.class != Pawn
+        #false
+        piece.class == Pawn ? true : false
       else
         true
       end
@@ -166,6 +159,9 @@ class Board
       naive_move_piece(from_coord, to_coord)
 
       mark_piece_moved(self[to_coord])
+
+      enemy_color = opposite_color(self[from_coord].color)
+      puts "CHECK!" if in_check?(enemy_color)
     else
       raise InvalidMoveError
     end
@@ -193,6 +189,41 @@ class Board
     y = 8 - coord[1].to_i
     [x, y]
   end
+
+  def is_check?(color)
+    enemy_color = opposite_color(color)
+
+    (0..7).each do |row|
+      (0..7).each do |col|
+        coord = [row, col]
+        piece = self[coord]
+        if piece && piece.color == enemy_color
+          return true if valid_move?(coord, king_position(color))
+        end
+      end
+    end
+
+    false
+  end
+
+  def king_position(color)
+    (0..7).each do |row|
+      (0..7).each do |col|
+        coord = [row, col]
+        piece = self[coord]
+
+        return coord if piece.is_a? King && piece.color == color
+      end
+    end
+
+    nil
+  end
+
+  def opposite_color(color)
+    color == :w ? :b : :w
+  end
+
+
 
 end
 
@@ -240,10 +271,6 @@ class King < Piece
   def initialize(color)
     super
     @range = 1
-  end
-
-  def move_set
-    @@MOVE_SET
   end
 
   def render
@@ -334,11 +361,12 @@ end
 
 class Pawn < Piece
 
-  PAWN_DIRECTIONS_WHITE = UP_DIAGONALS | UP
-  PAWN_DIRECTIONS_BLACK = DOWN_DIAGONALS | DOWN
-
   def move_directions
-    @color == :w ? PAWN_DIRECTIONS_WHITE : PAWN_DIRECTIONS_BLACK
+    @color == :w ? UP : DOWN
+  end
+
+  def attack_directions
+    @color == :w ? UP_DIAGONALS : DOWN_DIAGONALS
   end
 
   def render
