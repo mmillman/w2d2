@@ -53,6 +53,7 @@ class Board
                ]
   end
 
+  # REV: This is a great technique. 
   def [](coord_pair)
     # refactor rest of code so we can do board[x][y] here:
     @rows[coord_pair[1]][coord_pair[0]]
@@ -62,6 +63,7 @@ class Board
     @rows[coord_pair[1]][coord_pair[0]] = value
   end
 
+  # REV: Would be nice to show the x and y values so the player can pick a spot
   def show_board
     @rows.each_with_index do |row, index|
       print "#{@rows.length - index} "
@@ -78,9 +80,9 @@ class Board
 
   def valid_move?(from_coord, to_coord)
     piece = self[from_coord]
-    return false unless piece
+    return false unless piece  # REV: Should you also check the color?  
 
-    if piece.is_a? Pawn
+    if piece.is_a? Pawn 
       destination_attackable = piece.attack_directions.any? do |direction|
         attack_coord = move_once(from_coord, direction)
 
@@ -95,13 +97,16 @@ class Board
     end
   end
 
-  def valid_pawn_attack?(from_coord, attack_coord)
+  def valid_pawn_attack?(from_coord, attack_coord) # REV: Nice helper method
     attacking_pawn = self[from_coord]
     victim = self[attack_coord]
     victim ? victim.color != attacking_pawn.color : false
   end
 
-  def can_reach?(from_coord, to_coord, direction, piece)
+  # REV: This method needs a lot of information passed to it. 
+  #      Maybe you need a couple helper method. Ideally you 
+  #      would only need the from_cords and to_cords
+  def can_reach?(from_coord, to_coord, direction, piece)  
     moves_left = piece.range
 
     puts moves_left
@@ -124,6 +129,8 @@ class Board
     false
   end
 
+  # REV: This method is hard to follor. It hard to see exactly what 
+  #      an invalid_collision? is. 
   def invalid_collision?(possible_next_move, destination, piece)
     other_piece = self[possible_next_move]
     case
@@ -146,6 +153,8 @@ class Board
     coord.zip(direction).map { |pair| pair.reduce(0, :+) }
   end
 
+  # REV: Maybe this method could live in the pieces? So the board never deals with this
+  #      edgecase? 
   def off_board?(coord)
     coord.any? { |x| !x.between?(0, 7) }
   end
@@ -153,10 +162,11 @@ class Board
   # TODO: clean this up
   def make_move(coord1, coord2)
     # Is it ok to use crappy variable names as long as they're used up in the next line only for initial assignment?
+
     from_coord, to_coord = xy_coord(coord1), xy_coord(coord2)
     puts "#{self[from_coord]} at #{from_coord}"
     if valid_move?(from_coord, to_coord)
-      naive_move_piece(from_coord, to_coord)
+      naive_move_piece(from_coord, to_coord) # REV: I like the name, but I am not sure what it is doing?
 
       mark_piece_moved(self[to_coord])
 
@@ -191,7 +201,7 @@ class Board
   end
 
   def is_check?(color)
-    enemy_color = opposite_color(color)
+    enemy_color = opposite_color(color) # REV: I like the naming here
 
     (0..7).each do |row|
       (0..7).each do |col|
@@ -248,6 +258,9 @@ class Piece
 
   attr_accessor :range, :has_moved
   attr_reader :color
+
+  # REV: If all you want to do is store constants and helper methods
+  #      you may want to concider using a module and not a class. 
 
   HORIZONTALS = [[-1, 0], [1, 0]]
   UP = [[0, -1]]
